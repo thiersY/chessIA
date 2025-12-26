@@ -2,50 +2,179 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>IA Échecs V2 - Arbre de Probabilités Amélioré</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Échecs V2 - Adapté Mobile</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #1a252f; color: #ecf0f1; display: flex; flex-direction: column; align-items: center; padding: 10px; }
-        #game-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 1400px; }
-        
-        #board { width: 400px; border: 4px solid #34495e; border-radius: 5px; }
-        .panel { background: #2c3e50; padding: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #1a252f;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            margin: 0;
+        }
+        #game-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        #board {
+            width: 400px;
+            border: 4px solid #34495e;
+            border-radius: 5px;
+        }
+
+        .panel {
+            background: #2c3e50;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Adaptation mobile */
+        @media (max-width: 768px) {
+            #board {
+                width: 100%;
+                max-width: 350px;
+            }
+            .square-55d63 {
+                width: 12.5%;
+                height: 12.5%;
+                padding: 0;
+            }
+            .panel {
+                width: 100% !important;
+                max-width: 400px;
+            }
+            #game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .status-box {
+                font-size: 14px;
+            }
+            .mobile-help {
+                display: block;
+                background: #3498db;
+                padding: 8px;
+                border-radius: 4px;
+                margin-bottom: 10px;
+                text-align: center;
+                font-weight: bold;
+            }
+        }
+
+        .mobile-help {
+            display: none;
+        }
+
         /* Style de l'arbre */
-        #tree-container { width: 100%; max-width: 450px; height: 500px; overflow-y: auto; background: #1a1a1a; border-radius: 8px; font-family: monospace; font-size: 12px; padding: 10px; border: 1px solid #3498db; }
-        .tree-node { margin-left: 20px; border-left: 1px solid #444; padding-left: 10px; margin-top: 5px; }
+        #tree-container {
+            width: 100%;
+            max-width: 450px;
+            height: 500px;
+            overflow-y: auto;
+            background: #1a1a1a;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border: 1px solid #3498db;
+        }
+        .tree-node {
+            margin-left: 20px;
+            border-left: 1px solid #444;
+            padding-left: 10px;
+            margin-top: 5px;
+        }
         .node-best { color: #2ecc71; font-weight: bold; }
         .node-good { color: #3498db; }
         .node-bad { color: #e74c3c; }
         .node-score { color: #f1c40f; }
         .node-depth { color: #95a5a6; font-size: 10px; }
 
-        .status-box { margin-bottom: 10px; padding: 8px; background: #1a252f; border-left: 4px solid #27ae60; font-size: 0.9em; }
-        button { width: 100%; padding: 8px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 5px; font-weight: bold; }
-        .danger { background: #e74c3c; }
-        
-        .weight-viz { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; margin-top: 10px; background: #111; }
-        .weight-cell { aspect-ratio: 1; font-size: 0.6em; display: flex; align-items: center; justify-content: center; }
-        
-        .depth-control { display: flex; gap: 5px; margin: 10px 0; }
-        .depth-btn { width: auto !important; padding: 5px 10px !important; font-size: 12px; }
-        .depth-btn.active { background: #3498db; }
-        
-        .thinking { animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .status-box {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #1a252f;
+            border-left: 4px solid #27ae60;
+            font-size: 0.9em;
+        }
+        button {
+            width: 100%;
+            padding: 8px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .danger {
+            background: #e74c3c;
+        }
+
+        .weight-viz {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 1px;
+            margin-top: 10px;
+            background: #111;
+        }
+        .weight-cell {
+            aspect-ratio: 1;
+            font-size: 0.6em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .depth-control {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        .depth-btn {
+            width: auto !important;
+            padding: 5px 10px !important;
+            font-size: 12px;
+        }
+        .depth-btn.active {
+            background: #3498db;
+        }
+
+        .thinking {
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
 
-    <h1>🧠 IA Échecs Évolutive - Analyse Profonde en Temps Réel</h1>
-    
+    <h1>🧠 IA Échecs Évolutive - Adapté Mobile</h1>
+
+    <div class="mobile-help" id="mobile-help">
+        📱 Sur mobile : cliquez d'abord sur la pièce, puis sur la case de destination.
+    </div>
+
     <div id="game-container">
         <div id="board"></div>
-        
+
         <div class="panel" style="width: 280px;">
             <div class="status-box"><strong>Tour:</strong> <span id="status">Prêt</span></div>
             <div class="status-box">
@@ -64,10 +193,10 @@
                 </div>
                 <small>Profondeur actuelle: <span id="current-depth">3</span></small>
             </div>
-            
+
             <button onclick="resetGame()">🔄 Nouvelle Partie</button>
             <button class="danger" onclick="resetBrain()">🗑️ Reset Mémoire</button>
-            
+
             <hr style="border-color: #34495e;">
             <strong>Carte d'apprentissage :</strong>
             <div id="piece-selector" style="display:flex; gap:2px; margin:5px 0; flex-wrap: wrap;"></div>
@@ -89,15 +218,16 @@
         const PIECE_SYMBOLS = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
         let selectedPiece = 'p';
         let searchDepth = 3;
-        
-        let aiMemory = JSON.parse(localStorage.getItem('chessAI_memory_v2')) || { 
-            gamesPlayed: 0, 
-            wins: 0, 
+        let selectedSquare = null;
+
+        let aiMemory = JSON.parse(localStorage.getItem('chessAI_memory_v2')) || {
+            gamesPlayed: 0,
+            wins: 0,
             losses: 0,
             draws: 0,
-            weights: {} 
+            weights: {}
         };
-        
+
         if (Object.keys(aiMemory.weights).length === 0) {
             PIECE_TYPES.forEach(t => aiMemory.weights[t] = new Array(64).fill(0));
             // Initialisation avec bonus de centre pour les pions
@@ -172,6 +302,10 @@
             return `https://assets-themes.chess.com/image/ejgfv/150/${piece.toLowerCase()}.png`;
         }
 
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
         function setDepth(depth) {
             searchDepth = depth;
             document.getElementById('current-depth').textContent = depth;
@@ -190,32 +324,32 @@
 
             let total = 0;
             const values = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
-            
+
             g.board().forEach((row, i) => {
                 row.forEach((p, j) => {
                     if (p) {
                         const idx = i * 8 + j;
                         let pieceValue = values[p.type];
-                        
+
                         // Tables de position standard
                         let posBonus = pieceSquareTables[p.type][idx];
-                        
+
                         // Poids appris
                         let learnedWeight = aiMemory.weights[p.type][idx] || 0;
-                        
+
                         // Combinaison: 70% standard, 30% appris
                         let totalValue = pieceValue + (posBonus * 0.7) + (learnedWeight * 0.3);
-                        
+
                         total += (p.color === 'b' ? totalValue : -totalValue);
                     }
                 });
             });
-            
+
             // Bonus pour mobilité (nombre de coups possibles)
             const currentTurn = g.turn();
             const mobility = g.moves().length;
             total += currentTurn === 'b' ? mobility * 5 : -mobility * 5;
-            
+
             return total;
         }
 
@@ -224,19 +358,19 @@
             return moves.map(m => {
                 let score = 0;
                 const move = g.move(m);
-                
+
                 // Prioriser les captures
                 if (move.captured) {
                     const values = { p: 100, n: 320, b: 330, r: 500, q: 900 };
                     score += (values[move.captured] || 0) * 10;
                 }
-                
+
                 // Prioriser les échecs
                 if (g.in_check()) score += 50;
-                
+
                 // Prioriser les promotions
                 if (move.promotion) score += 900;
-                
+
                 g.undo();
                 return { move: m, priority: score };
             })
@@ -246,17 +380,17 @@
 
         // --- MINIMAX AVEC ALPHA-BETA ET TRACAGE D'ARBRE ---
         let nodesEvaluated = 0;
-        
+
         function minimax(g, depth, alpha, beta, isMax, treeElement, isRoot = false) {
             nodesEvaluated++;
-            
+
             if (depth === 0 || g.game_over()) {
                 return evaluateBoard(g);
             }
 
             let moves = g.moves();
             moves = orderMoves(g, moves); // Tri pour meilleure efficacité
-            
+
             // Limiter l'affichage pour la lisibilité
             const displayLimit = isRoot ? 10 : (depth >= 2 ? 5 : 3);
             let bestEval = isMax ? -Infinity : Infinity;
@@ -264,7 +398,7 @@
             for (let i = 0; i < moves.length; i++) {
                 const m = moves[i];
                 let node = null;
-                
+
                 if (i < displayLimit && treeElement) {
                     const indent = '  '.repeat(4 - depth);
                     node = $('<div class="tree-node"></div>')
@@ -288,7 +422,7 @@
                     if (eval < bestEval) bestEval = eval;
                     beta = Math.min(beta, eval);
                 }
-                
+
                 // Élagage Alpha-Beta
                 if (beta <= alpha) {
                     if (treeElement && i < displayLimit) {
@@ -307,36 +441,36 @@
             const $tree = $('#tree-container').empty();
             const $status = $('#status');
             $status.html('<span class="thinking">⏳ IA analyse...</span>');
-            
+
             $tree.append(`<div><strong>🔍 Analyse Profondeur ${searchDepth}</strong></div><hr style="border-color:#444;">`);
 
             setTimeout(() => {
                 nodesEvaluated = 0;
                 const startTime = Date.now();
-                
+
                 let moveEvaluations = [];
                 moves = orderMoves(game, moves); // Tri initial
-                
+
                 for (let m of moves) {
                     let moveNode = $('<div style="margin: 10px 0; padding: 8px; background: #2c3e50; border-left: 3px solid #3498db;"></div>')
                         .html(`<strong style="color:#2ecc71;">Coup: ${m}</strong>`);
-                    
+
                     game.move(m);
                     let val = minimax(game, searchDepth - 1, -Infinity, Infinity, false, moveNode);
                     game.undo();
-                    
+
                     moveEvaluations.push({ move: m, val: val, element: moveNode });
                 }
 
                 moveEvaluations.sort((a, b) => b.val - a.val);
-                
+
                 // Affichage des 8 meilleurs coups
                 $tree.append('<div style="margin: 10px 0;"><strong>Top Coups Évalués:</strong></div>');
                 moveEvaluations.slice(0, 8).forEach((e, idx) => {
                     e.element.prepend(`<span style="color:#f1c40f;">#${idx + 1}</span> `);
                     $tree.append(e.element);
                 });
-                
+
                 const timeElapsed = Date.now() - startTime;
                 $tree.append(`<hr style="border-color:#444;"><div style="color:#95a5a6; font-size:11px;">
                     ⚡ ${nodesEvaluated} positions évaluées en ${timeElapsed}ms<br>
@@ -348,7 +482,7 @@
                 game.move(chosenMove);
                 board.position(game.fen());
                 updateStatus();
-                
+
                 if (game.game_over()) handleGameOver();
             }, 100);
         }
@@ -357,7 +491,7 @@
         function handleGameOver() {
             let result = 0;
             let message = "";
-            
+
             if (game.in_checkmate()) {
                 if (game.turn() === 'w') {
                     result = 1; // IA gagne
@@ -373,46 +507,46 @@
                 message = "🤝 Match nul";
                 aiMemory.draws++;
             }
-            
+
             // Apprentissage: ajuster les poids selon le résultat
             const learningRate = result === 1 ? 20 : result === -1 ? -25 : 0;
-            
+
             game.board().forEach((row, i) => {
                 row.forEach((p, j) => {
                     if (p && p.color === 'b') {
                         const idx = i * 8 + j;
                         aiMemory.weights[p.type][idx] += learningRate;
-                        
+
                         // Limiter les poids pour éviter l'explosion
                         aiMemory.weights[p.type][idx] = Math.max(-500, Math.min(500, aiMemory.weights[p.type][idx]));
                     }
                 });
             });
-            
+
             aiMemory.gamesPlayed++;
             localStorage.setItem('chessAI_memory_v2', JSON.stringify(aiMemory));
             updateStatsUI();
             updateWeightVisualization();
-            
+
             alert(message);
         }
 
         function updateStatus() {
             const turn = game.turn() === 'w' ? "🤵 Votre tour (Blanc)" : "🤖 Tour de l'IA (Noir)";
             $('#status').html(turn);
-            
+
             if (game.in_check()) {
                 $('#status').append(' <span style="color:#e74c3c;">♔ ÉCHEC!</span>');
             }
         }
 
-        function updateStatsUI() { 
+        function updateStatsUI() {
             $('#game-count').text(aiMemory.gamesPlayed);
             $('#win-count').text(aiMemory.wins);
             $('#loss-count').text(aiMemory.losses);
-            
-            const winRate = aiMemory.gamesPlayed > 0 
-                ? ((aiMemory.wins / aiMemory.gamesPlayed) * 100).toFixed(1) 
+
+            const winRate = aiMemory.gamesPlayed > 0
+                ? ((aiMemory.wins / aiMemory.gamesPlayed) * 100).toFixed(1)
                 : 0;
             $('#win-rate').text(winRate + '%');
         }
@@ -439,22 +573,23 @@
             $('#piece-selector').html(html);
         }
 
-        function resetGame() { 
-            game.reset(); 
-            board.start(); 
+        function resetGame() {
+            game.reset();
+            board.start();
             updateStatus();
             $('#tree-container').html('<div style="color: #95a5a6;">En attente du prochain coup de l\'IA...</div>');
         }
-        
-        function resetBrain() { 
+
+        function resetBrain() {
             if (confirm('Voulez-vous vraiment effacer toute la mémoire de l\'IA ?')) {
-                localStorage.removeItem('chessAI_memory_v2'); 
-                location.reload(); 
+                localStorage.removeItem('chessAI_memory_v2');
+                location.reload();
             }
         }
 
+        // Initialisation du plateau
         board = Chessboard('board', {
-            draggable: true,
+            draggable: !isMobile(),
             position: 'start',
             pieceTheme: customPieceTheme,
             onDragStart: (source, piece) => {
@@ -467,8 +602,34 @@
                 updateStatus();
                 window.setTimeout(makeBestMove, 250);
             },
-            onSnapEnd: () => board.position(game.fen())
+            onSnapEnd: () => board.position(game.fen()),
+            onClick: (square) => {
+                if (isMobile() && !game.game_over()) {
+                    if (selectedSquare === null) {
+                        const piece = game.get(square);
+                        if (piece && piece.color === 'w') {
+                            selectedSquare = square;
+                            $(`.square-${square}`).css('background-color', 'rgba(255, 255, 0, 0.5)');
+                        }
+                    } else {
+                        const move = game.move({ from: selectedSquare, to: square, promotion: 'q' });
+                        if (move === null) {
+                            $(`.square-${selectedSquare}`).css('background-color', '');
+                            selectedSquare = null;
+                            return;
+                        }
+                        $(`.square-${selectedSquare}`).css('background-color', '');
+                        selectedSquare = null;
+                        updateStatus();
+                        window.setTimeout(makeBestMove, 250);
+                    }
+                }
+            }
         });
+
+        if (isMobile()) {
+            $('#mobile-help').show();
+        }
 
         initPieceSelector();
         updateWeightVisualization();
